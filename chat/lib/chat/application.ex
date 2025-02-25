@@ -8,8 +8,9 @@ defmodule Chat.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Chat.Worker.start_link(arg)
-      # {Chat.Worker, arg}
+      {Registry, keys: :duplicate, name: Chat.BroadcastRegistry},
+      {Registry, keys: :unique, name: Chat.UsernameRegistry},
+      {Chat.Acceptor, port: 4000}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
