@@ -31,17 +31,17 @@ defmodule Chat.Connection do
   end
 
   def handle_info(
-      {:tcp_closed, socket},
-      %__MODULE__{socket: socket} = state
-    ) do
+        {:tcp_closed, socket},
+        %__MODULE__{socket: socket} = state
+      ) do
     {:stop, :normal, state}
   end
 
   def handle_info(
-      {:tcp_error, socket, reason},
-      %__MODULE__{socket: socket} = state
-    ) do
-      Logger.error("TCP connection error: #{inspect(reason)}")
+        {:tcp_error, socket, reason},
+        %__MODULE__{socket: socket} = state
+      ) do
+    Logger.error("TCP connection error: #{inspect(reason)}")
     {:stop, :normal, state}
   end
 

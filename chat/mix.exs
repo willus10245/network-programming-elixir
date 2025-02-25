@@ -15,8 +15,21 @@ defmodule Chat.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Chat.Application, []}
+      mod: application_mod()
     ]
+  end
+
+  defp application_mod do
+    cond do
+      System.get_env("POOL") ->
+        {Chat.AcceptorPool.Application, []}
+
+      # System.get_env("THOUSAND_ISLAND") ->
+      #   {Chat.ThousandIsland.Application, []}
+
+      true ->
+        {Chat.Application, []}
+    end
   end
 
   # Run "mix help deps" to learn about dependencies.
