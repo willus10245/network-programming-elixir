@@ -24,8 +24,8 @@ defmodule Chat.MixProject do
       System.get_env("POOL") ->
         {Chat.AcceptorPool.Application, []}
 
-      # System.get_env("THOUSAND_ISLAND") ->
-      #   {Chat.ThousandIsland.Application, []}
+      System.get_env("THOUSAND_ISLAND") ->
+        {Chat.ThousandIsland.Application, []}
 
       true ->
         {Chat.Application, []}
@@ -35,6 +35,7 @@ defmodule Chat.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:thousand_island, "~> 1.3"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
