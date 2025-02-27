@@ -1,4 +1,4 @@
-defmodule RedisClient do
+defmodule RedisClientt do
   @moduledoc """
   Documentation for `RedisClient`.
   """
