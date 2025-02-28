@@ -12,10 +12,11 @@ defmodule Chat.AcceptorPool.Acceptor do
 
   @doc false
   def __accept_loop__(listen_socket) do
-    case :gen_tcp.accept(listen_socket, 2_000) do
+    case :ssl.transport_accept(listen_socket, 2_000) do
       {:ok, socket} ->
+        Logger.debug("Accepted TLS connection")
         {:ok, pid} = ConnectionSupervisor.start_connection(socket)
-        :ok = :gen_tcp.controlling_process(socket, pid)
+        :ok = :ssl.controlling_process(socket, pid)
         __accept_loop__(listen_socket)
 
       {:error, :timeout} ->

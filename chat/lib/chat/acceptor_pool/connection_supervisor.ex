@@ -6,7 +6,7 @@ defmodule Chat.AcceptorPool.ConnectionSupervisor do
     DynamicSupervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  @spec start_connection(:gen_tcp.socket()) :: Supervisor.on_start_child()
+  @spec start_connection(:ssl.sslsocket()) :: Supervisor.on_start_child()
   def start_connection(socket) do
     DynamicSupervisor.start_child(__MODULE__, {Chat.Connection, socket})
   end

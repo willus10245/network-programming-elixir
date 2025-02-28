@@ -8,37 +8,43 @@ defmodule Chat.Connection do
 
   defstruct [:socket, :username, buffer: <<>>]
 
-  @spec start_link(:gen_tcp.socket()) :: GenServer.on_start()
+  @spec start_link(:ssl.sslsocket()) :: GenServer.on_start()
   def start_link(socket) do
     GenServer.start_link(__MODULE__, socket)
   end
 
   @impl true
   def init(socket) do
-    {:ok, %__MODULE__{socket: socket}}
+    case :ssl.handshake(socket) do
+      {:ok, socket} ->
+        {:ok, %__MODULE__{socket: socket}}
+
+      {:error, reason} ->
+        {:stop, reason}
+    end
   end
 
   @impl true
   def handle_info(msg, state)
 
   def handle_info(
-        {:tcp, socket, data},
+        {:ssl, socket, data},
         %__MODULE__{socket: socket} = state
       ) do
-    :inet.setopts(socket, active: :once)
+    :ssl.setopts(socket, active: :once)
     state = update_in(state.buffer, &(&1 <> data))
     handle_new_data(state)
   end
 
   def handle_info(
-        {:tcp_closed, socket},
+        {:ssl_closed, socket},
         %__MODULE__{socket: socket} = state
       ) do
     {:stop, :normal, state}
   end
 
   def handle_info(
-        {:tcp_error, socket, reason},
+        {:ssl_error, socket, reason},
         %__MODULE__{socket: socket} = state
       ) do
     Logger.error("TCP connection error: #{inspect(reason)}")
@@ -47,7 +53,7 @@ defmodule Chat.Connection do
 
   def handle_info({:broadcast, %Broadcast{} = message}, state) do
     encoded_message = Chat.Protocol.encode_message(message)
-    :ok = :gen_tcp.send(state.socket, encoded_message)
+    :ok = :ssl.send(state.socket, encoded_message)
     {:noreply, state}
   end
 
