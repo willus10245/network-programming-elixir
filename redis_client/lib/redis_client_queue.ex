@@ -1,4 +1,4 @@
-defmodule RedisClient do
+defmodule RedisClientQueued do
   use GenServer
   require Logger
   alias RedisClient.RESP
