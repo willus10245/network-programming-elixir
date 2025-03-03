@@ -5,6 +5,8 @@ defmodule XStats.Reporter do
 
   use GenServer
 
+  require Logger
+
   defstruct [:socket, :dest_port]
 
   @spec start_link(keyword()) :: GenServer.on_start()
@@ -42,10 +44,18 @@ defmodule XStats.Reporter do
     end
   end
 
+  @mtu 512
+
   @impl true
   def handle_cast({:send_metric, metric}, %__MODULE__{} = state) do
     iodata = XStats.Protocol.encode_metric(metric)
-    _ = :gen_udp.send(state.socket, ~c"localhost", state.dest_port, iodata)
+
+    if IO.iodata_length(iodata) > @mtu do
+      Logger.error("Metric too large to send: #{inspect(metric)}")
+    else
+      _ = :gen_udp.send(state.socket, ~c"localhost", state.dest_port, iodata)
+    end
+
     {:noreply, state}
   end
 end
